@@ -1,0 +1,23 @@
+{
+  "name": "mydiary-backend",
+  "version": "1.0.0",
+  "description": "Mydiary - The Cloud Diary.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeveshSawale/myDiary-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeveshSawale/myDiary-backend/issues"
+  },
+  "homepage": "https://github.com/DeveshSawale/myDiary-backend#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^6.9.0"
+  }
+}
