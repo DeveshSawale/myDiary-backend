@@ -37,5 +37,52 @@ router.post('/addnote',fetchuser,[
         res.status(500).send("Internal Server Error")
     }
 })
+// ROUTE 3 : Update a note using PUT  : login required
+router.put('/updatenote/:id',fetchuser, async (req,res)=>{
+    try {
+        const {title, description} = req.body;
+        // new note 
+        const newNote = {};
+        if(title){
+            newNote.title = title
+            newNote.description = description
+        }
+        // find the note to be updated
+        let oldNote = await Notes.findById(req.params.id);
+        if(!oldNote){
+            res.status(404).send("Not found")
+        }
+        if(oldNote.user.toString() !== req.user.id){
+            return res.status(401).send("Unauthorized")
+        }
+
+        oldNote = await Notes.findByIdAndUpdate(req.params.id, {$set : newNote}, {new : true});
+        res.json(newNote)
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error")
+    }
+})
+
+// ROUTE 4 : Delete a note using DELETE  : login required
+router.delete('/deletenote/:id',fetchuser, async (req,res)=>{
+    try {
+        // find the note to be Deleted
+        let oldNote = await Notes.findById(req.params.id);
+        if(!oldNote){
+            res.status(404).send("Not found")
+        }
+        if(oldNote.user.toString() !== req.user.id){
+            return res.status(401).send("Unauthorized")
+        }
+ 
+        oldNote = await Notes.findByIdAndDelete(req.params.id);
+        res.json({"Success" : "The note was deleted", oldNote})
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error")
+    }
+})
 
 module.exports = router
