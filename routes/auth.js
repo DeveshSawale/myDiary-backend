@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 require("dotenv").config();
 
+
+// ROUTE 1 : creating a new user using POST : SINGUP
 router.post('/createuser',[
     // express validation
     body('email',"Enter a valid email!").isEmail(),
@@ -17,7 +19,7 @@ router.post('/createuser',[
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
+    
     try {
         let user = await User.findOne({email : req.body.email});
         
@@ -45,10 +47,47 @@ router.post('/createuser',[
         
     } catch (error) {
         console.error(error.message);
-        res.status(500).send("Some Error occured")
+        res.status(500).send("Internal Server Error")
+    }
+})
+ 
+
+// ROUTE 2 : authenticate a user using POST : LOGIN
+router.post('/login',[
+    // express validation
+    body('email',"Enter a valid email!").isEmail(),
+    body('password',"Enter a password").exists(),
+], async (req,res)=> {  
+    
+    // if express validator detects any error
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
+    const {email,password} = req.body
+    try {
+        let user = await User.findOne({email})
+        if(!user){
+            return res.status(400).json({error : "Authentication failed!1"})
+        }
+        const isPassCorrect = await bcrypt.compare(password,user.password)
+        if(!isPassCorrect){
+            return res.status(400).json({error : "Authentication failed!2"})
+        }
+        const data = {
+            user : {
+                id : user.id
+            }
+        }
+        const token = jwt.sign(data,process.env.secret)
     
+        res.json({token})
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Internal Server Error")
+    }
 })
 
 module.exports = router
